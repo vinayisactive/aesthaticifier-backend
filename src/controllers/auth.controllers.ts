@@ -2,8 +2,8 @@ import { Context } from "hono"
 import { registerValidation, signInValidation } from "../utilities/validation/zodValidation";
 import { createPrismaClient } from "../config/database";
 import bcryptjs from 'bcryptjs'
-import { sign } from "hono/jwt";
-import { setCookie } from "hono/cookie";
+import { sign, verify } from "hono/jwt";
+import { getCookie, setCookie } from "hono/cookie";
 
 const register = async(c: Context) => {
     try {
@@ -19,8 +19,8 @@ const register = async(c: Context) => {
 
         const { name, email, password } = userData.data 
 
-        const { DATABASE_URL, JWT_SECRET } = c.env;
-        if (!DATABASE_URL || !JWT_SECRET) {
+        const { DATABASE_URL } = c.env;
+        if (!DATABASE_URL) {
             return c.json({ message: "Server configuration error" }, 500);
         }
 
@@ -126,11 +126,48 @@ const signin = async(c: Context) => {
         return c.json({
             message: "Failed to register",
             error : error instanceof Error ? error.message : "Internal server error"
-        },500)
+        },500);
     }
 }
 
+const checkAuth = async(c: Context) => {
+    try {
+        const token = getCookie(c, 'token'); 
+        
+        const {JWT_SECRET } = c.env;
+        if (!JWT_SECRET) {
+            return c.json({ message: "Server configuration error" }, 500);
+        }
+
+        if (!token) {
+            return c.json({
+                authenticated: false
+            }, 401);
+        }
+
+        const currentTime : number = Math.floor(Date.now() / 1000);
+
+        const decodedToken = await verify(token, JWT_SECRET); 
+        if (decodedToken.exp && decodedToken.exp < currentTime) {
+            return c.json({ message: "Token has expired"}, 401);
+        }; 
+
+        return c.json({
+            authenticated: true,
+        }, 200);
+
+    } catch (error) {
+        return c.json({
+            message: "Failed to check auth status",
+            error : error instanceof Error ? error.message : "Internal server error"
+        }, 500);
+    }
+}
+
+
+
 export {
     register,
-    signin
+    signin,
+    checkAuth
 }
