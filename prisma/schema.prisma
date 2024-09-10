@@ -8,13 +8,70 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Category {
+  DOODLES
+  SHOES 
+  WINTERS
+  ANIMALS
+  BLACKANDWHITE
+  TEXT
+  TRAVEL
+  FLOWERS
+}
 
 model User {
   id        String      @id @default(uuid())
-  name      String
+  name     String
   email     String   @unique
-  username  String   @unique
   password  String
   isAdmin   Boolean  @default(false)
+  address Address[]
+  designs Design[]
+  cartItems CartItem[]
 }
+
+model Address{
+  id String @id @default(uuid())
+  city      String
+  area      String
+  street    String
+  zipcode   String
+  country   String
+  user  User @relation(fields: [userId], references: [id])
+  userId String
+}
+model Design {
+  id String @id @default(uuid())
+  name String
+  imageUrl String
+  assets DesignAssets[]
+  createdBy User @relation(fields: [userId], references: [id])
+  userId String
+  cartItems CartItem[]
+}
+
+model DesignAssets {
+  id String @id @default(uuid())
+  name String 
+  imageUrl String
+  design Design @relation(fields: [designId], references: [id])
+  designId String
+}
+model Stickers {
+  id String @id @default(uuid())
+  category Category
+  imageUrl String 
+}
+model CartItem {
+  id String @id @default(uuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  design Design @relation(fields: [designId], references: [id])
+  designId String
+  quantity  Int    @default(1)
+   @@unique([userId, designId])
+}
+
+
+
 
