@@ -132,25 +132,13 @@ const signin = async(c: Context) => {
 
 const checkAuth = async(c: Context) => {
     try {
-        const token = getCookie(c, 'token'); 
-        
-        const {JWT_SECRET } = c.env;
-        if (!JWT_SECRET) {
-            return c.json({ message: "Server configuration error" }, 500);
-        }
+       const user =  c.get('userId'); 
 
-        if (!token) {
+        if (!user) {
             return c.json({
                 authenticated: false
             }, 401);
         }
-
-        const currentTime : number = Math.floor(Date.now() / 1000);
-
-        const decodedToken = await verify(token, JWT_SECRET); 
-        if (decodedToken.exp && decodedToken.exp < currentTime) {
-            return c.json({ message: "Token has expired"}, 401);
-        }; 
 
         return c.json({
             authenticated: true,
