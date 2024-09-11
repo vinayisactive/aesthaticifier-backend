@@ -8,11 +8,16 @@ const authMiddleware = async(c: Context, next: Next) => {
         
         const {JWT_SECRET } = c.env;
         if (!JWT_SECRET) {
-            return c.json({ message: "Server configuration error" }, 500);
+            return c.json({ 
+                success: false,
+                message: "Server configuration error" 
+            }, 500);
         }
 
         if (!token) {
             return c.json({
+                success: false,
+                message: "User is not signed-in",
                 authenticated: false
             }, 401);
         }
@@ -21,16 +26,23 @@ const authMiddleware = async(c: Context, next: Next) => {
 
         const decodedToken = await verify(token, JWT_SECRET); 
         if (decodedToken.exp && decodedToken.exp < currentTime) {
-            return c.json({ message: "Token has expired"}, 401);
+            return c.json({ 
+                success: false,
+                message: "Token has expired"
+            }, 401);
         }; 
 
-        c.set('userId', decodedToken.userId); 
+        c.set('user', {
+            token: decodedToken.userId,
+            isAdmin: decodedToken.isAdmin
+        }); 
+
         await next(); 
 
     } catch (error) {
         return c.json({
-            message: "Invalid token or authentication error",
-            error: error instanceof Error ? error.message : "Internal server error",
+            success: false,
+            message: error instanceof Error ? error.message : "Internal server"
         },500);
     }
 };
