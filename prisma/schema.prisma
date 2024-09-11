@@ -53,7 +53,7 @@ model Category{
 }
 model Stickers {
   id String @id @default(uuid())
-  category Category @relation(fields: [categoryId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId String
   imageUrl String 
   publicId String?
