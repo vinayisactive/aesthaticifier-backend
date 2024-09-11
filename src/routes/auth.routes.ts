@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { checkAuth, register, signin } from "../controllers/auth.controllers";
 import { Binding } from "../types/envInterface";
-import authMiddleware from "../middlewares/auth.middlewares";
+import { authMiddleware, adminMiddleware } from "../middlewares/index";
 
 const authRouter = new Hono<{ Bindings: Binding }>(); 
 
