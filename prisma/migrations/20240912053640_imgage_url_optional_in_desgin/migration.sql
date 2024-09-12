@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Design" ADD COLUMN     "isEmpty" BOOLEAN NOT NULL DEFAULT true,
+ALTER COLUMN "imageUrl" DROP NOT NULL;

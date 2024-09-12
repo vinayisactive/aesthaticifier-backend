@@ -32,7 +32,8 @@ model Address{
 model Design {
   id String @id @default(uuid())
   name String
-  imageUrl String
+  imageUrl String?
+  isEmpty Boolean @default(true)
   assets DesignAssets[]
   createdBy User @relation(fields: [userId], references: [id])
   userId String
@@ -43,6 +44,7 @@ model DesignAssets {
   id String @id @default(uuid())
   name String 
   imageUrl String
+  publicId String
   design Design @relation(fields: [designId], references: [id])
   designId String
 }
