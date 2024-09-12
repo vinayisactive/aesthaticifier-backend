@@ -41,14 +41,6 @@ const getAssets = async(c:Context) => {
     }
 }
 
-const updateAsset = async(c: Context) => {
-    try {
-        
-    } catch (error) {
-        
-    }
-}
-
 const deleteAsset = async(c: Context) => {
     try {
         
@@ -63,6 +55,5 @@ export {
     getDesigns,
     createAsset,
     getAssets,
-    updateAsset,
     deleteAsset
 }
